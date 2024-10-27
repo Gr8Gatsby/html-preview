@@ -18,6 +18,7 @@ h1 {
     text-align: center;
 }
 
+/* General button style */
 button {
     background-color: #007bff;
     color: white;
@@ -30,6 +31,25 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+/* Icon button style for better contrast */
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 20px;
+    color: #007bff; /* Default color for icons */
+    transition: color 0.2s ease-in-out; /* Smooth transition */
+}
+
+.icon-button:hover {
+    color: #0056b3; /* Darker color for better contrast on hover */
+}
+
+.material-icons {
+    vertical-align: middle;
 }
 
 #htmlList {
@@ -56,6 +76,7 @@ button:hover {
     cursor: pointer;
 }
 
+/* Specific styles for view and delete buttons */
 .view-btn, .delete-btn {
     background: none;
     border: none;
@@ -65,6 +86,7 @@ button:hover {
     margin: 0 5px;
 }
 
+/* Time label style */
 .time-span {
     flex-basis: 100%;
     font-size: 0.8rem;
@@ -73,6 +95,14 @@ button:hover {
     margin-top: 5px;
 }
 
+/* Style for file size label */
+.size-label {
+    font-size: 0.8rem;
+    color: #555;
+    margin-right: 10px;
+}
+
+/* Modal background and content styling */
 .modal {
     position: fixed;
     top: 0;
@@ -116,6 +146,7 @@ button:hover {
     flex-grow: 1;
 }
 
+/* Preview frame and exit bar */
 .preview-frame-container {
     position: fixed;
     top: 40px; /* Height of the exit bar */
@@ -154,6 +185,7 @@ button:hover {
     cursor: pointer;
 }
 
+/* Inline editable input styling */
 .name-input {
     border: none;
     background: transparent;
@@ -172,19 +204,93 @@ button:hover {
     padding: 5px;
 }
 
-.icon-button {
-    background: none;
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header h2 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #333;
+    text-align: center;
+}
+
+.modal-body {
+    flex-grow: 1;
+    padding: 10px 0;
+}
+
+.info-section {
+    background: #f8f8f8;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #555;
+}
+
+.info-value {
+    font-weight: normal;
+    color: #333;
+}
+
+.info-section h3 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #007bff;
+}
+
+.close-button {
+    background-color: #007bff;
+    color: white;
     border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
     cursor: pointer;
-    padding: 5px;
-    font-size: 20px;
-    color: #007bff; /* Customize the icon color */
+    margin-top: 10px;
+    text-align: center;
 }
 
-.icon-button:hover {
-    color: #0056b3;
+.close-button:hover {
+    background-color: #0056b3;
 }
 
-.material-icons {
+.info-section ol {
+    padding-left: 20px;
+}
+
+.info-section li {
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.info-section li .material-icons {
+    font-size: 18px;
+    margin-right: 5px;
     vertical-align: middle;
+}
+
+.info-section li .material-icons.lock {
+    color: #4caf50;
+    background: #e8f5e9;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.info-section li .material-icons.warning {
+    color: #f44336;
+    background: #ffebee;
+    border-radius: 50%;
+    padding: 2px;
 }

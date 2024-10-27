@@ -36,6 +36,20 @@
         </div>
     </div>
 
+    <div id="metadataModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>File Info</h2>
+            </div>
+            <div class="modal-body" id="metadataContent">
+                <!-- Metadata content will be dynamically inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button class="close-button" onclick="closeMetadataModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
     <!-- <script>
         if ('serviceWorker' in navigator) {

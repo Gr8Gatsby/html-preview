@@ -1,26 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Preview App</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css" rel="stylesheet" />
 </head>
+
 <body>
     <div id="listView" class="view">
         <h1>Saved HTML Files</h1>
         <button onclick="openModal()">Add HTML</button>
-        
+
         <ul id="htmlList"></ul>
     </div>
 
     <div id="previewView" class="view" style="display: none;">
         <div class="exit-bar">
             <button onclick="exitPreview()">Exit</button>
+            <button onclick="showPrettyPrint()" style="margin-left: auto;">Pretty Print</button>
         </div>
         <div class="preview-frame-container">
             <iframe id="htmlPreview" class="preview-frame"></iframe>
+        </div>
+    </div>
+
+    <!-- Modal for Pretty Printed HTML -->
+    <div id="prettyPrintModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Formatted HTML</h2>
+            <pre id="prettyPrintContent" class="language-html"
+                style="max-height: 70vh; overflow-y: auto; background: #f8f8f8; padding: 10px; border-radius: 5px;"></pre>
+            <button class="close-button" onclick="closePrettyPrintModal()">Close</button>
         </div>
     </div>
 
@@ -52,6 +66,8 @@
 
     <script src="app.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/js-beautify@1.14.7/js/lib/beautify-html.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-html.min.js"></script>
     <!-- <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -66,4 +82,5 @@
         }
     </script> -->
 </body>
+
 </html>

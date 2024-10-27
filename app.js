@@ -275,3 +275,29 @@ function closeMetadataModal() {
 function closeMetadataModal() {
     document.getElementById('metadataModal').style.display = 'none';
 }
+
+function showPrettyPrint() {
+    const iframe = document.getElementById('htmlPreview');
+    const htmlContent = iframe.contentDocument.documentElement.outerHTML;
+
+    // Use html_beautify to format the HTML
+    const prettyHtml = html_beautify(htmlContent, {
+        indent_size: 2,
+        wrap_line_length: 80
+    });
+
+    // Set the formatted HTML in the pre element
+    const preElement = document.getElementById('prettyPrintContent');
+    preElement.textContent = prettyHtml;
+
+    // Highlight the content using Prism.js
+    Prism.highlightElement(preElement);
+
+    // Show the modal
+    document.getElementById('prettyPrintModal').style.display = 'flex';
+}
+
+// Function to close the Pretty Print modal
+function closePrettyPrintModal() {
+    document.getElementById('prettyPrintModal').style.display = 'none';
+}

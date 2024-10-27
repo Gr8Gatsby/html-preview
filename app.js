@@ -1,11 +1,40 @@
+
 let savedFiles = JSON.parse(localStorage.getItem('htmlFiles') || '[]');
 let documentCounter = savedFiles.length + 1; // Initialize counter based on existing documents
 let currentEditIndex = null; // Track the index of the currently edited item
 
 document.addEventListener('DOMContentLoaded', () => {
     loadHTMLFiles();
-    document.getElementById('htmlContent').addEventListener('input', updateTitle);
+    const htmlContentInput = document.getElementById('htmlContent');
+
+    // Automatically paste HTML content if valid HTML is found in the clipboard
+    htmlContentInput.addEventListener('focus', async () => {
+        try {
+            const clipboardText = await navigator.clipboard.readText();
+            const isHtmlDocument = checkIfHtmlDocument(clipboardText);
+
+            if (isHtmlDocument) {
+                htmlContentInput.value = clipboardText;
+                updateTitle(); // Update the title based on the new content
+            }
+        } catch (error) {
+            console.error('Failed to read from clipboard:', error);
+        }
+    });
+
+    htmlContentInput.addEventListener('input', updateTitle);
 });
+
+// Function to check if the clipboard content is a full HTML document
+function checkIfHtmlDocument(content) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+
+    // Check if the parsed document contains an <html> element
+    return doc.documentElement.tagName.toLowerCase() === 'html';
+}
+
+// Other existing functions like openModal, closeModal, saveHTML, etc.
 
 function openModal(index = null) {
     document.getElementById('modal').style.display = 'flex';

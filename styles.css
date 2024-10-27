@@ -178,11 +178,12 @@ button:hover {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
-    color: #007bff; /* Customize the icon color */
+    color: #007bff; /* Default color for icons */
+    transition: color 0.2s ease-in-out; /* Smooth transition */
 }
 
 .icon-button:hover {
-    color: #0056b3;
+    color: #fff; /* Darker color for better contrast on hover */
 }
 
 .material-icons {

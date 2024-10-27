@@ -1,22 +1,31 @@
-self.addEventListener('install', event => {
+const CACHE_NAME = 'my-pwa-cache-v1'; // Change the version number (v1) when making updates
+
+self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open('pwa-cache').then(cache => {
+        caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
                 '/',
                 '/index.html',
-                '/manifest.json',
                 '/styles.css',
-                '/icons/icon-192x192.png',
-                '/icons/icon-512x512.png'
+                '/app.js',
+                '/manifest.json'
             ]);
         })
     );
 });
 
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request);
+self.addEventListener('activate', (event) => {
+    const cacheWhitelist = [CACHE_NAME];
+
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (!cacheWhitelist.includes(cacheName)) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
         })
     );
 });

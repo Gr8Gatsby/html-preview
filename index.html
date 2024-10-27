@@ -3,27 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My PWA</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-    </style>
+    <title>HTML Preview App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <h1>Welcome to My PWA</h1>
-    <p>This is a simple Progressive Web App hosted on GitHub Pages.</p>
+    <div id="listView" class="view">
+        <h1>Saved HTML Files</h1>
+        <button onclick="openModal()">Add HTML</button>
+        
+        <ul id="htmlList"></ul>
+    </div>
 
-    <script>
+    <div id="previewView" class="view" style="display: none;">
+        <div class="exit-bar">
+            <button onclick="exitPreview()">Exit</button>
+        </div>
+        <div class="preview-frame-container">
+            <iframe id="htmlPreview" class="preview-frame"></iframe>
+        </div>
+    </div>
+
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Manage HTML</h2>
+            <textarea id="htmlContent" placeholder="Paste HTML content..." rows="10"></textarea>
+            <div id="nameInputContainer" style="display: none;">
+                <input type="text" id="htmlNameInput" placeholder="Enter a name (optional)" />
+            </div>
+            <button onclick="saveHTML()">Save</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <!-- <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => console.log('Service Worker registered with scope:', registration.scope))
-                .catch(error => console.error('Service Worker registration failed:', error));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
         }
-    </script>
+    </script> -->
 </body>
 </html>

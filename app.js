@@ -1,94 +1,14 @@
 
+import { openModal, closeModal, saveHTML } from './js/modal.js';
+
 let savedFiles = JSON.parse(localStorage.getItem('htmlFiles') || '[]');
 let documentCounter = savedFiles.length + 1; // Initialize counter based on existing documents
 let currentEditIndex = null; // Track the index of the currently edited item
+let currentViewIndex = null; // Track the index of the currently viewed HTML document
 
 document.addEventListener('DOMContentLoaded', () => {
     loadHTMLFiles();
 });
-
-
-// Other existing functions like openModal, closeModal, saveHTML, etc.
-
-function openModal(index = null) {
-    document.getElementById('modal').style.display = 'flex';
-    document.getElementById('nameInputContainer').style.display = 'none';
-    document.getElementById('htmlContent').value = '';
-    document.getElementById('htmlNameInput').value = '';
-
-    // If an index is provided, it means we are editing
-    if (index !== null) {
-        currentEditIndex = index;
-        const file = savedFiles[index];
-        document.getElementById('htmlContent').value = file.content;
-        document.getElementById('htmlNameInput').value = file.name;
-        document.getElementById('nameInputContainer').style.display = 'block';
-    } else {
-        currentEditIndex = null; // Reset if adding new HTML
-    }
-}
-
-function closeModal() {
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('htmlContent').value = '';
-    document.getElementById('htmlNameInput').value = '';
-    currentEditIndex = null;
-}
-
-function saveHTML() {
-    let contentInput = document.getElementById('htmlContent').value.trim();
-    const nameInput = document.getElementById('htmlNameInput').value.trim();
-
-    if (!contentInput) {
-        alert('Please enter HTML content.');
-        return;
-    }
-
-    // Format the HTML using js-beautify
-    contentInput = html_beautify(contentInput, {
-        indent_size: 2,  // Set the indentation size for formatting
-        wrap_line_length: 80,
-        end_with_newline: true
-    });
-
-    const extractedTitle = extractTitle(contentInput);
-    const name = nameInput || extractedTitle || `HTML Document #${documentCounter++}`;
-    const timestamp = Date.now();
-
-    // Calculate metadata
-    const sizeInKB = (new Blob([contentInput]).size / 1024).toFixed(2);
-    const scriptTagsCount = (contentInput.match(/<script[\s\S]*?>/gi) || []).length;
-    const externalUrls = (contentInput.match(/https?:\/\/[^\s"'>]+/gi) || []).map(url => {
-        const baseUrl = url.split('/').slice(0, 3).join('/');
-        const isHttps = baseUrl.startsWith('https');
-        return { url: baseUrl, isHttps };
-    });
-
-    const metadata = {
-        size: `${sizeInKB} KB`,
-        scripts: scriptTagsCount,
-        externalReferences: externalUrls.length,
-        externalUrls
-    };
-
-    const htmlFile = {
-        name,
-        content: contentInput,
-        timestamp,
-        metadata
-    };
-
-    // Update or save the new HTML file
-    if (currentEditIndex !== null) {
-        savedFiles[currentEditIndex] = htmlFile;
-    } else {
-        savedFiles.push(htmlFile);
-    }
-
-    localStorage.setItem('htmlFiles', JSON.stringify(savedFiles));
-    loadHTMLFiles();
-    closeModal();
-}
 
 function updateTitle() {
     const content = document.getElementById('htmlContent').value;
@@ -99,11 +19,6 @@ function updateTitle() {
     } else {
         document.getElementById('nameInputContainer').style.display = 'block';
     }
-}
-
-function extractTitle(htmlContent) {
-    const titleMatch = htmlContent.match(/<title>(.*?)<\/title>/i);
-    return titleMatch ? titleMatch[1] : null;
 }
 
 function loadHTMLFiles() {
@@ -138,7 +53,7 @@ function loadHTMLFiles() {
         const viewButton = document.createElement('button');
         viewButton.className = 'icon-button';
         viewButton.innerHTML = '<span class="material-icons">visibility</span>';
-        viewButton.onclick = () => viewHTML(file.content);
+        viewButton.onclick = () => viewHTML(file.content, index);
         iconGroup.appendChild(viewButton);
 
         const editButton = document.createElement('button');
@@ -185,7 +100,8 @@ function deleteHTML(index) {
     loadHTMLFiles();
 }
 
-function viewHTML(content) {
+function viewHTML(content, index) {
+    currentViewIndex = index; // Store the index of the currently viewed HTML document
     const previewIframe = document.getElementById('htmlPreview');
     document.getElementById('listView').style.display = 'none';
     document.getElementById('previewView').style.display = 'block';
@@ -272,13 +188,14 @@ function closeMetadataModal() {
     document.getElementById('metadataModal').style.display = 'none';
 }
 
-function closeMetadataModal() {
-    document.getElementById('metadataModal').style.display = 'none';
-}
-
 function showPrettyPrint() {
-    const iframe = document.getElementById('htmlPreview');
-    const htmlContent = iframe.contentDocument.documentElement.outerHTML;
+    if (currentViewIndex === null || !savedFiles[currentViewIndex]) {
+        alert('Unable to retrieve HTML content.');
+        return;
+    }
+
+    const file = savedFiles[currentViewIndex];
+    const htmlContent = file.content;
 
     // Use html_beautify to format the HTML
     const prettyHtml = html_beautify(htmlContent, {
@@ -301,3 +218,22 @@ function showPrettyPrint() {
 function closePrettyPrintModal() {
     document.getElementById('prettyPrintModal').style.display = 'none';
 }
+
+// At the end of app.js or after defining each function
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.saveHTML = saveHTML;
+window.showPrettyPrint = showPrettyPrint;
+window.closePrettyPrintModal = closePrettyPrintModal;
+window.exitPreview = exitPreview;
+window.showMetadata = showMetadata;
+window.closeMetadataModal = closeMetadataModal;
+window.documentCounter = documentCounter;
+window.currentEditIndex = currentEditIndex;
+window.savedFiles = savedFiles;
+window.loadHTMLFiles = loadHTMLFiles;
+window.updateTitle = updateTitle;
+window.saveNameChange = saveNameChange;
+window.deleteHTML = deleteHTML;
+window.viewHTML = viewHTML;
+window.currentViewIndex = currentViewIndex;

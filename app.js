@@ -74,12 +74,39 @@ function saveHTML() {
     const name = nameInput || extractedTitle || `HTML Document #${documentCounter++}`;
     const timestamp = Date.now();
 
-    // If editing an existing item, update the content
+    // Calculate metadata
+    const sizeInKB = (new Blob([contentInput]).size / 1024).toFixed(2); // Calculate size in KB
+    const scriptTagsCount = (contentInput.match(/<script[\s\S]*?>/gi) || []).length;
+
+    // Extract external URLs using a pattern that matches any URL starting with http or https
+    const externalUrls = (contentInput.match(/https?:\/\/[^\s"'>]+/gi) || []).map(url => {
+        // Extract the base URL up to the first slash after the domain
+        const baseUrl = url.split('/').slice(0, 3).join('/');
+        const isHttps = baseUrl.startsWith('https');
+        return { url: baseUrl, isHttps };
+    });
+
+    const externalReferencesCount = externalUrls.length;
+
+    const metadata = {
+        size: `${sizeInKB} KB`,
+        scripts: scriptTagsCount,
+        externalReferences: externalReferencesCount,
+        externalUrls
+    };
+
+    const htmlFile = {
+        name,
+        content: contentInput,
+        timestamp,
+        metadata
+    };
+
+    // If editing an existing item, update it
     if (currentEditIndex !== null) {
-        savedFiles[currentEditIndex] = { name, content: contentInput, timestamp };
+        savedFiles[currentEditIndex] = htmlFile;
     } else {
-        // Otherwise, add a new item
-        savedFiles.push({ name, content: contentInput, timestamp });
+        savedFiles.push(htmlFile);
     }
 
     localStorage.setItem('htmlFiles', JSON.stringify(savedFiles));
@@ -109,6 +136,13 @@ function loadHTMLFiles() {
     htmlListElement.innerHTML = '';
 
     savedFiles.forEach((file, index) => {
+        // Ensure metadata has default values if missing
+        const metadata = file.metadata || {
+            size: 'Unknown',
+            scripts: 'Unknown',
+            externalReferences: 'Unknown'
+        };
+
         const listItem = document.createElement('li');
 
         const nameInput = document.createElement('input');
@@ -134,6 +168,10 @@ function loadHTMLFiles() {
         timeSpan.textContent = `Saved ${formatTimeDifference(file.timestamp)}`;
         timeSpan.className = 'time-span';
 
+        const sizeLabel = document.createElement('span');
+        sizeLabel.textContent = metadata.size;
+        sizeLabel.className = 'size-label';
+
         const viewButton = document.createElement('button');
         viewButton.className = 'icon-button';
         viewButton.innerHTML = '<span class="material-icons">visibility</span>';
@@ -144,14 +182,21 @@ function loadHTMLFiles() {
         editButton.innerHTML = '<span class="material-icons">edit</span>';
         editButton.onclick = () => openModal(index);
 
+        const infoButton = document.createElement('button');
+        infoButton.className = 'icon-button';
+        infoButton.innerHTML = '<span class="material-icons">info</span>';
+        infoButton.onclick = () => showMetadata(index);
+
         const deleteButton = document.createElement('button');
         deleteButton.className = 'icon-button';
         deleteButton.innerHTML = '<span class="material-icons">delete</span>';
         deleteButton.onclick = () => deleteHTML(index);
 
         listItem.appendChild(nameInput);
+        listItem.appendChild(sizeLabel);
         listItem.appendChild(viewButton);
         listItem.appendChild(editButton);
+        listItem.appendChild(infoButton);
         listItem.appendChild(deleteButton);
         listItem.appendChild(timeSpan);
         htmlListElement.appendChild(listItem);
@@ -205,4 +250,61 @@ function formatTimeDifference(timestamp) {
             year: 'numeric'
         });
     }
+}
+
+function showMetadata(index) {
+    if (index === undefined || index === null) {
+        console.warn('Metadata index is undefined or null.');
+        return;
+    }
+
+    const file = savedFiles[index];
+    if (!file) {
+        console.warn('No file found at the provided index:', index);
+        return;
+    }
+
+    // Ensure metadata has default values if missing
+    const metadata = file.metadata || {
+        size: 'Unknown',
+        scripts: 'Unknown',
+        externalReferences: 'Unknown',
+        externalUrls: []
+    };
+
+    // Create an ordered list of external URLs if available, with icons based on http/https
+    const externalUrlsList = metadata.externalUrls.length > 0
+        ? `<ol>${metadata.externalUrls.map(({ url, isHttps }) => {
+            const icon = isHttps ? 'lock' : 'warning';
+            const iconColor = isHttps ? '#4caf50' : '#f44336'; // Green for HTTPS, red for HTTP
+            return `<li>
+                        <span class="material-icons" style="color: ${iconColor}; vertical-align: middle;">${icon}</span>
+                        ${url}
+                    </li>`;
+        }).join('')}</ol>`
+        : '<p>No external URLs found.</p>';
+
+    const metadataContent = `
+        <div class="info-section">
+            <p><span class="info-label">Name:</span> <span class="info-value">${file.name}</span></p>
+            <p><span class="info-label">Size:</span> <span class="info-value">${metadata.size}</span></p>
+            <p><span class="info-label">Number of Scripts:</span> <span class="info-value">${metadata.scripts}</span></p>
+            <p><span class="info-label">External References:</span> <span class="info-value">${metadata.externalReferences}</span></p>
+        </div>
+        <div class="info-section">
+            <h3>External URLs</h3>
+            ${externalUrlsList}
+        </div>
+    `;
+
+    document.getElementById('metadataContent').innerHTML = metadataContent;
+    document.getElementById('metadataModal').style.display = 'flex';
+}
+
+function closeMetadataModal() {
+    document.getElementById('metadataModal').style.display = 'none';
+}
+
+function closeMetadataModal() {
+    document.getElementById('metadataModal').style.display = 'none';
 }

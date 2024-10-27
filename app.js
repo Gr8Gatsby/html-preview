@@ -1,10 +1,10 @@
 
 import { openModal, closeModal, saveHTML } from './js/modal.js';
+import { viewHTML, exitPreview, showPrettyPrint, closePrettyPrintModal, currentViewIndex, refreshPreview } from './js/preview.js';
 
 let savedFiles = JSON.parse(localStorage.getItem('htmlFiles') || '[]');
 let documentCounter = savedFiles.length + 1; // Initialize counter based on existing documents
 let currentEditIndex = null; // Track the index of the currently edited item
-let currentViewIndex = null; // Track the index of the currently viewed HTML document
 
 document.addEventListener('DOMContentLoaded', () => {
     loadHTMLFiles();
@@ -100,19 +100,6 @@ function deleteHTML(index) {
     loadHTMLFiles();
 }
 
-function viewHTML(content, index) {
-    currentViewIndex = index; // Store the index of the currently viewed HTML document
-    const previewIframe = document.getElementById('htmlPreview');
-    document.getElementById('listView').style.display = 'none';
-    document.getElementById('previewView').style.display = 'block';
-    previewIframe.srcdoc = content;
-}
-
-function exitPreview() {
-    document.getElementById('listView').style.display = 'block';
-    document.getElementById('previewView').style.display = 'none';
-}
-
 function formatTimeDifference(timestamp) {
     const now = Date.now();
     const savedTime = new Date(timestamp);
@@ -188,42 +175,10 @@ function closeMetadataModal() {
     document.getElementById('metadataModal').style.display = 'none';
 }
 
-function showPrettyPrint() {
-    if (currentViewIndex === null || !savedFiles[currentViewIndex]) {
-        alert('Unable to retrieve HTML content.');
-        return;
-    }
-
-    const file = savedFiles[currentViewIndex];
-    const htmlContent = file.content;
-
-    // Use html_beautify to format the HTML
-    const prettyHtml = html_beautify(htmlContent, {
-        indent_size: 2,
-        wrap_line_length: 80
-    });
-
-    // Set the formatted HTML in the pre element
-    const preElement = document.getElementById('prettyPrintContent');
-    preElement.textContent = prettyHtml;
-
-    // Highlight the content using Prism.js
-    Prism.highlightElement(preElement);
-
-    // Show the modal
-    document.getElementById('prettyPrintModal').style.display = 'flex';
-}
-
-// Function to close the Pretty Print modal
-function closePrettyPrintModal() {
-    document.getElementById('prettyPrintModal').style.display = 'none';
-}
-
 // At the end of app.js or after defining each function
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.saveHTML = saveHTML;
-window.showPrettyPrint = showPrettyPrint;
 window.closePrettyPrintModal = closePrettyPrintModal;
 window.exitPreview = exitPreview;
 window.showMetadata = showMetadata;
@@ -237,3 +192,5 @@ window.saveNameChange = saveNameChange;
 window.deleteHTML = deleteHTML;
 window.viewHTML = viewHTML;
 window.currentViewIndex = currentViewIndex;
+window.showPrettyPrint = () => showPrettyPrint(savedFiles);
+window.refreshPreview = () => refreshPreview(savedFiles);

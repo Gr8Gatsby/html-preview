@@ -22,6 +22,9 @@
         <div class="exit-bar">
             <button onclick="exitPreview()">Exit</button>
             <button onclick="showPrettyPrint()" style="margin-left: auto;">Pretty Print</button>
+            <button onclick="refreshPreview()">
+                <span class="material-icons">refresh</span>
+            </button>
         </div>
         <div class="preview-frame-container">
             <iframe id="htmlPreview" class="preview-frame"></iframe>
@@ -66,6 +69,7 @@
 
     <script src="app.js" type="module"></script>
     <script src="js/modal.js" type="module"></script>
+    <script src="js/preview.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-beautify@1.14.7/js/lib/beautify-html.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-html.min.js"></script>

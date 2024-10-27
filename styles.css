@@ -16,6 +16,8 @@ body {
 h1 {
     font-size: 1.5rem;
     text-align: center;
+    color: #333;
+    margin-bottom: 20px;
 }
 
 /* General button style */
@@ -27,6 +29,7 @@ button {
     cursor: pointer;
     border-radius: 5px;
     margin-top: 10px;
+    transition: background-color 0.2s;
 }
 
 button:hover {
@@ -40,66 +43,83 @@ button:hover {
     cursor: pointer;
     padding: 5px;
     font-size: 20px;
-    color: #007bff; /* Default color for icons */
-    transition: color 0.2s ease-in-out; /* Smooth transition */
+    color: #007bff;
+    transition: color 0.2s ease-in-out;
 }
 
 .icon-button:hover {
-    color: #0056b3; /* Darker color for better contrast on hover */
+    color: #0056b3;
 }
 
 .material-icons {
     vertical-align: middle;
 }
 
+/* Card-style list item */
 #htmlList {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 #htmlList li {
     background: white;
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-info {
+    display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
-#htmlList li .name {
-    flex-grow: 1;
+.file-info .name {
     font-size: 1rem;
-    margin-right: 10px;
-    cursor: pointer;
+    color: #333;
+    flex-grow: 1;
 }
 
-/* Specific styles for view and delete buttons */
-.view-btn, .delete-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0 10px;
-    margin: 0 5px;
+.file-info .size-label {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Icon group styling - always on a new line */
+.icon-group {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Align the icon group nicely on smaller screens */
+@media (max-width: 600px) {
+    .file-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .icon-group {
+        justify-content: space-evenly;
+    }
 }
 
 /* Time label style */
 .time-span {
-    flex-basis: 100%;
-    font-size: 0.8rem;
-    color: #666;
+    font-size: 0.75rem;
+    color: #777;
     text-align: right;
-    margin-top: 5px;
-}
-
-/* Style for file size label */
-.size-label {
-    font-size: 0.8rem;
-    color: #555;
-    margin-right: 10px;
+    width: 100%;
 }
 
 /* Modal background and content styling */
@@ -119,23 +139,28 @@ button:hover {
 .modal-content {
     background: white;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 10px;
     width: 90%;
-    max-width: 800px;
-    height: 80%;
+    max-width: 600px;
+    height: 80%; /* Adjusted height for better usability */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    overflow-y: auto; /* Add scrolling if content overflows */
 }
 
 .modal-content h2 {
-    margin: 0 0 10px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
 }
 
-.modal-content input, .modal-content textarea {
+.modal-content input,
+.modal-content textarea {
     width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
+    margin-bottom: 15px;
+    padding: 12px;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -143,17 +168,52 @@ button:hover {
 }
 
 .modal-content textarea {
-    flex-grow: 1;
+    flex-grow: 1; /* Ensures the textarea takes up available space */
+}
+
+.close-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 10px;
+    align-self: center;
+    transition: background-color 0.2s;
+}
+
+.close-button:hover {
+    background-color: #0056b3;
+}
+
+/* Inline editable input styling */
+.name-input {
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    margin-right: 10px;
+    cursor: pointer;
+    outline: none;
+    flex: 1;
+}
+
+.name-input:focus {
+    background: #f0f0f0;
+    cursor: text;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 /* Preview frame and exit bar */
 .preview-frame-container {
     position: fixed;
-    top: 40px; /* Height of the exit bar */
+    top: 40px;
     left: 0;
     right: 0;
     bottom: 0;
-    overflow: auto; /* Enable scrolling for the iframe content */
+    overflow: auto;
 }
 
 .preview-frame {
@@ -173,7 +233,6 @@ button:hover {
     display: flex;
     align-items: center;
     padding: 0 10px;
-    box-sizing: border-box;
     z-index: 5;
 }
 
@@ -183,114 +242,4 @@ button:hover {
     color: white;
     font-size: 1rem;
     cursor: pointer;
-}
-
-/* Inline editable input styling */
-.name-input {
-    border: none;
-    background: transparent;
-    font-size: 1rem;
-    flex-grow: 1;
-    margin-right: 10px;
-    cursor: pointer;
-    outline: none;
-}
-
-.name-input:focus {
-    background: #f0f0f0;
-    cursor: text;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 5px;
-}
-
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 600px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-header h2 {
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    color: #333;
-    text-align: center;
-}
-
-.modal-body {
-    flex-grow: 1;
-    padding: 10px 0;
-}
-
-.info-section {
-    background: #f8f8f8;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
-
-.info-label {
-    font-weight: bold;
-    color: #555;
-}
-
-.info-value {
-    font-weight: normal;
-    color: #333;
-}
-
-.info-section h3 {
-    font-size: 1rem;
-    margin-bottom: 5px;
-    color: #007bff;
-}
-
-.close-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    margin-top: 10px;
-    text-align: center;
-}
-
-.close-button:hover {
-    background-color: #0056b3;
-}
-
-.info-section ol {
-    padding-left: 20px;
-}
-
-.info-section li {
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-}
-
-.info-section li .material-icons {
-    font-size: 18px;
-    margin-right: 5px;
-    vertical-align: middle;
-}
-
-.info-section li .material-icons.lock {
-    color: #4caf50;
-    background: #e8f5e9;
-    border-radius: 50%;
-    padding: 2px;
-}
-
-.info-section li .material-icons.warning {
-    color: #f44336;
-    background: #ffebee;
-    border-radius: 50%;
-    padding: 2px;
 }

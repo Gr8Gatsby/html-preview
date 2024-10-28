@@ -265,14 +265,16 @@ modal-content {
     flex-direction: column;
 }
 
-/* Toolbar styling */
+/* Compact Toolbar */
 .toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
+    padding: 8px 15px; /* Adjusted padding for spacing */
+    background-color: #ffffff;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px; /* Add space below the toolbar */
 }
 
 .toolbar-title {
@@ -291,9 +293,9 @@ modal-content {
     background-color: #007bff;
     color: #fff;
     border: none;
-    padding: 10px 15px;
+    padding: 8px 12px; /* Smaller padding for compactness */
     font-size: 0.9rem;
-    border-radius: 20px;
+    border-radius: 20px; /* Keeps the rounded style */
     cursor: pointer;
     transition: background-color 0.2s;
 }

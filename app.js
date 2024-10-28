@@ -6,11 +6,14 @@ import { loadHTMLFiles } from './js/htmlFilesList.js';
 import { saveFiles, deleteHTML as deleteFile } from './js/storage.js';
 
 let savedFiles = JSON.parse(localStorage.getItem('htmlFiles') || '[]');
+if (!Array.isArray(savedFiles)) {
+    savedFiles = [];
+}
 let documentCounter = savedFiles.length + 1; // Initialize counter based on existing documents
 let currentEditIndex = null; // Track the index of the currently edited item
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadHTMLFiles();
+    loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
 });
 
 function updateTitle() {
@@ -23,22 +26,6 @@ function updateTitle() {
         document.getElementById('nameInputContainer').style.display = 'block';
     }
 }
-
-function saveNameChange(nameInput, index) {
-    const newName = nameInput.value.trim();
-    if (newName) {
-        savedFiles[index].name = newName;
-        localStorage.setItem('htmlFiles', JSON.stringify(savedFiles));
-    }
-    nameInput.readOnly = true;
-}
-
-function deleteHTML(index) {
-    savedFiles.splice(index, 1);
-    localStorage.setItem('htmlFiles', JSON.stringify(savedFiles));
-    loadHTMLFiles();
-}
-
 
 // At the end of app.js or after defining each function
 window.openModal = openModal;

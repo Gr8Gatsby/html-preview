@@ -2,7 +2,7 @@
 import { openModal, closeModal, saveHTML } from './js/modal.js';
 import { viewHTML, exitPreview, showPrettyPrint, closePrettyPrintModal, currentViewIndex, refreshPreview } from './js/preview.js';
 import { showMetadata, closeMetadataModal } from './js/metadata.js';
-import { loadHTMLFiles, toggleSortOrder } from './js/htmlFilesList.js';
+import { loadHTMLFiles, toggleSortOrder, handleSearch } from './js/htmlFilesList.js';
 import { saveFiles, deleteHTML as deleteFile } from './js/storage.js';
 
 let savedFiles = JSON.parse(localStorage.getItem('htmlFiles') || '[]');
@@ -62,3 +62,4 @@ window.toggleSortOrder = () => {
     saveFiles(savedFiles);
     loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
 };
+window.handleSearch = handleSearch;

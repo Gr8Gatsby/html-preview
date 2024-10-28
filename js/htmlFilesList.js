@@ -1,13 +1,19 @@
 // Sort order: true for descending (most recent first), false for ascending (oldest first)
 let sortOrderDescending = true;
+let searchQuery = '';
 
-// Function to load and display HTML files with sorting and other functionalities
+// Function to load and display HTML files with sorting and filtering functionalities
 export function loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML) {
     const htmlListElement = document.getElementById('htmlList');
     htmlListElement.innerHTML = '';
 
+    // Filter files based on the search query
+    const filteredFiles = savedFiles.filter((file) => 
+        file.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     // Sort files based on the selected order
-    const sortedFiles = [...savedFiles].sort((a, b) => {
+    const sortedFiles = filteredFiles.sort((a, b) => {
         const dateA = new Date(a.timestamp);
         const dateB = new Date(b.timestamp);
         return sortOrderDescending ? dateB - dateA : dateA - dateB;
@@ -17,7 +23,7 @@ export function loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, del
         const metadata = file.metadata || { size: 'Unknown', scripts: 'Unknown', externalReferences: 'Unknown' };
 
         const listItem = document.createElement('li');
-        listItem.dataset.savedDate = file.timestamp; // Add dataset for sorting
+        listItem.dataset.savedDate = file.timestamp;
 
         // Create the file info section
         const fileInfo = document.createElement('div');
@@ -118,4 +124,10 @@ function updateSortIcon() {
     } else {
         iconElement.textContent = 'north'; // Represents ascending order
     }
+}
+
+export function handleSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchQuery = searchInput.value.trim();
+    loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
 }

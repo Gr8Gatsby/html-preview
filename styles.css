@@ -299,3 +299,31 @@ modal-content {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+
+/* Search Box Styling */
+.search-container {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 10px;
+    flex-grow: 1;
+}
+
+.search-container input {
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    flex-grow: 1;
+    background: transparent;
+}
+
+.search-container .icon-button {
+    padding: 0 10px;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+}

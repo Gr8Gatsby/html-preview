@@ -13,9 +13,15 @@
 <body>
     <div id="listView" class="view">
         <div class="toolbar">
-            <button class="button button-primary" onclick="openModal()">Add HTML</button>
+            <button class="button-primary" onclick="openModal()">Add HTML</button>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by title..." oninput="handleSearch()" />
+                <button class="icon-button" title="Search">
+                    <span class="material-icons">search</span>
+                </button>
+            </div>
             <button class="icon-button" onclick="toggleSortOrder()" id="sortButton" title="Sort by date">
-                <span class="material-icons">sort</span>
+                <span class="material-icons">south</span>
             </button>
         </div>
         <ul id="htmlList"></ul>

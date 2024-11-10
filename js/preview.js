@@ -43,17 +43,19 @@ export function closePrettyPrintModal() {
     document.getElementById('prettyPrintModal').style.display = 'none';
 }
 
-export function refreshPreview(savedFiles) {
-    if (currentViewIndex === null || !savedFiles[currentViewIndex]) {
-        alert('Unable to refresh. No HTML content loaded.');
-        return;
-    }
-
-    const file = savedFiles[currentViewIndex];
-    const content = file.content;
-    
+export function refreshPreview() {
     const previewIframe = document.getElementById('htmlPreview');
-    previewIframe.srcdoc = content; // Reload the content in the iframe
+
+    // Check if iframe has a `src` URL or `srcdoc`
+    if (previewIframe.src) {
+        // Reload by refreshing the URL
+        previewIframe.contentWindow.location.reload();
+    } else if (previewIframe.srcdoc) {
+        // Re-trigger srcdoc to reload inline HTML
+        previewIframe.srcdoc = previewIframe.srcdoc;
+    } else {
+        alert('Unable to refresh. No content loaded in iframe.');
+    }
 }
 
 export { currentViewIndex };

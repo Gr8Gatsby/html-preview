@@ -13,7 +13,7 @@
 <body>
     <div id="listView" class="view">
         <div class="toolbar">
-            <button class="button-primary" onclick="openModal()">Add HTML</button>
+            <button class="button-primary" onclick="openModal()">New</button>
             <div class="search-container">
                 <input type="text" id="searchInput" placeholder="Search by title..." oninput="handleSearch()" />
                 <button class="icon-button" title="Search">
@@ -57,8 +57,10 @@
             <div id="nameInputContainer" style="display: none;">
                 <input type="text" id="htmlNameInput" placeholder="Enter a name (optional)" />
             </div>
-            <button onclick="saveHTML()">Save</button>
-            <button onclick="closeModal()">Cancel</button>
+            <div class="button-container">
+                <button class="button-primary" onclick="saveHTML()">Save</button>
+                <button class="button-primary" onclick="closeModal()">Cancel</button>
+            </div>
         </div>
     </div>
 

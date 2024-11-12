@@ -1,11 +1,19 @@
-let currentViewIndex = null;
+let currentViewFileName = null; // Use file name to track the currently viewed document
 
-export function viewHTML(content, index) {
-    currentViewIndex = index; // Store the index of the currently viewed HTML document
+export function viewHTML(content, fileName) {
+    currentViewFileName = fileName; // Store the file name of the currently viewed HTML document
     const previewIframe = document.getElementById('htmlPreview');
+
+    // Display preview view and hide the list view
     document.getElementById('listView').style.display = 'none';
     document.getElementById('previewView').style.display = 'block';
-    previewIframe.srcdoc = content;
+
+    // Set the content of the iframe
+    if (previewIframe) {
+        previewIframe.srcdoc = content;
+    } else {
+        console.error("Could not find iframe with ID 'htmlPreview'");
+    }
 }
 
 export function exitPreview() {
@@ -14,12 +22,18 @@ export function exitPreview() {
 }
 
 export function showPrettyPrint(savedFiles) {
-    if (currentViewIndex === null || !savedFiles[currentViewIndex]) {
+    if (!currentViewFileName) {
         alert('Unable to retrieve HTML content.');
         return;
     }
 
-    const file = savedFiles[currentViewIndex];
+    // Find the file by its name
+    const file = savedFiles.find(f => f.name === currentViewFileName);
+    if (!file) {
+        alert('File not found.');
+        return;
+    }
+
     const htmlContent = file.content;
 
     // Use html_beautify to format the HTML
@@ -58,4 +72,4 @@ export function refreshPreview() {
     }
 }
 
-export { currentViewIndex };
+export { currentViewFileName };

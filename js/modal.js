@@ -1,21 +1,29 @@
-// modal.js
+let currentEditFileName = null; // Declare the variable at the top
 
-export function openModal(index = null) {
-    currentEditIndex = index;
+// Updated openModal function to use fileName instead of index
+export function openModal(fileName = null) {
     document.getElementById('modal').style.display = 'flex';
     document.getElementById('nameInputContainer').style.display = 'none';
     document.getElementById('htmlContent').value = '';
     document.getElementById('htmlNameInput').value = '';
 
-    // If an index is provided, it means we are editing
-    if (index !== null) {
-        currentEditIndex = index;
-        const file = savedFiles[index];
-        document.getElementById('htmlContent').value = file.content;
-        document.getElementById('htmlNameInput').value = file.name;
-        document.getElementById('nameInputContainer').style.display = 'block';
+    // If a fileName is provided, it means we are editing
+    if (fileName !== null) {
+        const file = savedFiles.find(f => f.name === fileName);
+        if (file) {
+            // Populate the modal with the file's content and name
+            document.getElementById('htmlContent').value = file.content;
+            document.getElementById('htmlNameInput').value = file.name;
+            document.getElementById('nameInputContainer').style.display = 'block';
+
+            // Optionally store the index or reference of the current file being edited
+            currentEditFileName = fileName; // Track the file being edited
+        } else {
+            console.error(`File with name "${fileName}" not found.`);
+        }
     } else {
-        currentEditIndex = null; // Reset if adding new HTML
+        // If adding new HTML
+        currentEditFileName = null;
     }
 }
 
@@ -23,7 +31,7 @@ export function closeModal() {
     document.getElementById('modal').style.display = 'none';
     document.getElementById('htmlContent').value = '';
     document.getElementById('htmlNameInput').value = '';
-    currentEditIndex = null;
+    currentEditFileName = null;
 }
 
 export function saveHTML() {
@@ -37,7 +45,7 @@ export function saveHTML() {
 
     // Format the HTML using js-beautify
     contentInput = html_beautify(contentInput, {
-        indent_size: 2,  // Set the indentation size for formatting
+        indent_size: 2,
         wrap_line_length: 80,
         end_with_newline: true
     });
@@ -70,14 +78,18 @@ export function saveHTML() {
     };
 
     // Update or save the new HTML file
-    if (currentEditIndex !== null) {
-        savedFiles[currentEditIndex] = htmlFile;
+    if (currentEditFileName !== null) {
+        // Find the index of the file being edited by its name
+        const fileIndex = savedFiles.findIndex(f => f.name === currentEditFileName);
+        if (fileIndex !== -1) {
+            savedFiles[fileIndex] = htmlFile; // Update the existing file
+        }
     } else {
-        savedFiles.push(htmlFile);
+        savedFiles.push(htmlFile); // Add new file
     }
 
     localStorage.setItem('htmlFiles', JSON.stringify(savedFiles));
-    loadHTMLFiles();
+    loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML); // Reload the list
     closeModal();
 }
 

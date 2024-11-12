@@ -1,6 +1,5 @@
-
 import { openModal, closeModal, saveHTML } from './js/modal.js';
-import { viewHTML, exitPreview, showPrettyPrint, closePrettyPrintModal, currentViewIndex, refreshPreview } from './js/preview.js';
+import { viewHTML, exitPreview, showPrettyPrint, closePrettyPrintModal, currentViewFileName, refreshPreview } from './js/preview.js';
 import { showMetadata, closeMetadataModal } from './js/metadata.js';
 import { loadHTMLFiles, toggleSortOrder, handleSearch } from './js/htmlFilesList.js';
 import { saveFiles, deleteHTML as deleteFile } from './js/storage.js';
@@ -54,7 +53,7 @@ window.deleteHTML = (index) => {
     loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
 };
 window.viewHTML = viewHTML;
-window.currentViewIndex = currentViewIndex;
+window.currentViewFileName = currentViewFileName; // Updated to use currentViewFileName
 window.showPrettyPrint = () => showPrettyPrint(savedFiles);
 window.refreshPreview = () => refreshPreview(savedFiles);
 window.toggleSortOrder = () => {

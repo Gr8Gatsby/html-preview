@@ -5,6 +5,7 @@ import { showMetadata } from './metadata.js';
 let currentEditFile = null; // Track the file being edited
 
 // Open the modal for creating or editing an HTML file
+// Open the modal for creating or editing an HTML file
 export async function openModal(fileId = null) {
     const modal = document.getElementById('modal');
     modal.style.display = 'flex';
@@ -38,14 +39,19 @@ export async function openModal(fileId = null) {
             document.getElementById('htmlNameInput').value = currentEditFile.name;
             document.getElementById('nameInputContainer').style.display = 'block';
 
-            // Set up metadata button
-            document.getElementById('metadataButton').onclick = () => {
-                if (currentEditFile && currentEditFile.id) {
-                    showMetadata(currentEditFile.id); // Show metadata for the current file
-                } else {
-                    alert('No file selected to view metadata.');
-                }
-            };
+            // Set up metadata button safely
+            const metadataButton = document.getElementById('metadataButton');
+            if (metadataButton) {  // Check if metadataButton exists
+                metadataButton.onclick = () => {
+                    if (currentEditFile && currentEditFile.id) {
+                        showMetadata(currentEditFile.id); // Show metadata for the current file
+                    } else {
+                        alert('No file selected to view metadata.');
+                    }
+                };
+            } else {
+                console.warn('Metadata button not found in DOM.');
+            }
         } catch (error) {
             console.error(`Error loading file with ID "${fileId}":`, error);
             alert('An error occurred while loading the file.');

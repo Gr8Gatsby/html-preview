@@ -255,6 +255,7 @@ button:hover {
     border: none;
 }
 
+/* Exit Bar Styling */
 .exit-bar {
     position: fixed;
     top: 0;
@@ -265,6 +266,7 @@ button:hover {
     color: white;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Ensures content is spaced between left, center, and right */
     padding: 0 10px;
     z-index: 5;
 }
@@ -275,6 +277,21 @@ button:hover {
     color: white;
     font-size: 1rem;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.exit-bar span#documentName {
+    flex-grow: 1; /* Takes up remaining space for centering */
+    text-align: center; /* Ensures the title is centered */
+    font-weight: bold;
+    font-size: 1rem;
+    margin: 0; /* Removes default margin */
+}
+
+.exit-bar .action-buttons {
+    display: flex;
+    gap: 10px; /* Adds spacing between Pretty and Refresh buttons */
 }
 
 /* Pretty Print Content */

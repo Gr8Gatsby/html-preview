@@ -29,10 +29,23 @@
 
     <div id="previewView" class="view" style="display: none;">
         <div class="exit-bar">
-            <button onclick="exitPreview()">Exit</button>
-            <span id="documentName" style="margin-left: 10px; font-weight: bold;"></span>
-            <button onclick="showPrettyPrint()"><span class="material-icons">format_paint</span></button>
-            <button onclick="refreshPreview()"><span class="material-icons">refresh</span></button>
+            <!-- Back Arrow Button -->
+            <button onclick="exitPreview()">
+                <span class="material-icons">arrow_back</span>
+            </button>
+            
+            <!-- Document Name -->
+            <span id="documentName">Document Title</span>
+            
+            <!-- Action Buttons (Pretty and Refresh) -->
+            <div class="action-buttons">
+                <button onclick="showPrettyPrint()">
+                    <span class="material-icons">format_paint</span>
+                </button>
+                <button onclick="refreshPreview()">
+                    <span class="material-icons">refresh</span>
+                </button>
+            </div>
         </div>
         <div class="preview-frame-container">
             <iframe id="htmlPreview" class="preview-frame"></iframe>

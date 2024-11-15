@@ -6,15 +6,24 @@ let searchQuery = '';
 // Function to load and display HTML files with sorting and filtering functionalities
 export async function loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML) {
     const htmlListElement = document.getElementById('htmlList');
-    htmlListElement.innerHTML = '';
 
     // Fetch files from IndexedDB
     let savedFiles = await loadSavedFiles();
 
+    if (!savedFiles || savedFiles.length === 0) {
+        htmlListElement.innerHTML = `<li>No files available.</li>`;
+        return;
+    }
+
     // Filter files based on the search query
-    const filteredFiles = savedFiles.filter((file) => 
+    const filteredFiles = savedFiles.filter((file) =>
         file.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    if (filteredFiles.length === 0) {
+        htmlListElement.innerHTML = `<li>No matching files found.</li>`;
+        return;
+    }
 
     // Sort files based on the selected order
     const sortedFiles = filteredFiles.sort((a, b) => {
@@ -23,68 +32,31 @@ export async function loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTM
         return sortOrderDescending ? dateB - dateA : dateA - dateB;
     });
 
+    // If the list is empty or needs rebuilding, clear and re-render the list
+    htmlListElement.innerHTML = '';
     sortedFiles.forEach((file) => {
-        const metadata = file.metadata || {
-            compressedSize: 'Unknown',
-            uncompressedSize: 'Unknown',
-            scripts: 'Unknown',
-            externalReferences: 'Unknown'
-        };
-    
         const listItem = document.createElement('li');
-        listItem.dataset.savedDate = file.createdAt;
-    
-        // Create the file info section
-        const fileInfo = document.createElement('div');
-        fileInfo.className = 'file-info';
-    
-        const nameElement = document.createElement('span');
-        nameElement.className = 'name';
-        nameElement.textContent = `${file.name} (ID: ${file.id})`; // Display file name and ID for debugging
-        fileInfo.appendChild(nameElement);
-    
-        const sizeLabel = document.createElement('span');
-        sizeLabel.className = 'size-label';
-        sizeLabel.textContent = `Compressed: ${metadata.compressedSize}, Uncompressed: ${metadata.uncompressedSize}`;
-        fileInfo.appendChild(sizeLabel);
-    
-        listItem.appendChild(fileInfo);
-    
-        // Create the icon group section
-        const iconGroup = document.createElement('div');
-        iconGroup.className = 'icon-group';
-    
-        const viewButton = document.createElement('button');
-        viewButton.className = 'icon-button';
-        viewButton.innerHTML = '<span class="material-icons">visibility</span>';
-        viewButton.onclick = () => viewHTML(file.id);
-        iconGroup.appendChild(viewButton);
-    
-        const editButton = document.createElement('button');
-        editButton.className = 'icon-button';
-        editButton.innerHTML = '<span class="material-icons">edit</span>';
-        editButton.onclick = () => openModal(file.id);
-        iconGroup.appendChild(editButton);
-    
-        const infoButton = document.createElement('button');
-        infoButton.className = 'icon-button';
-        infoButton.innerHTML = '<span class="material-icons">info</span>';
-        infoButton.onclick = () => showMetadata(file.id);
-        iconGroup.appendChild(infoButton);
-    
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'icon-button';
-        deleteButton.innerHTML = '<span class="material-icons">delete</span>';
-        deleteButton.onclick = () => deleteHTML(file.id);
-        iconGroup.appendChild(deleteButton);
-    
-        listItem.appendChild(iconGroup);
-    
-        const timeSpan = document.createElement('p');
-        timeSpan.textContent = `Saved ${formatTimeDifference(file.createdAt)}`;
-        timeSpan.className = 'time-span';
-        listItem.appendChild(timeSpan);
-    
+        listItem.dataset.fileId = file.id; // Attach file ID to the element
+        listItem.classList.add('file-item'); // Add a class for styling
+        listItem.innerHTML = `
+            <div class="file-info">
+                <span class="file-name">${file.name} (ID: ${file.id})</span>
+                <span class="timestamp">${formatTimeDifference(file.createdAt)}</span>
+            </div>
+            <div class="button-group">
+                <button class="icon-button viewButton" title="View"><i class="material-icons">visibility</i></button>
+                <button class="icon-button editButton" title="Edit"><i class="material-icons">edit</i></button>
+                <button class="icon-button infoButton" title="Info"><i class="material-icons">info</i></button>
+                <button class="icon-button deleteButton" title="Delete"><i class="material-icons">delete</i></button>
+            </div>
+        `;
+
+        // Attach event listeners to buttons
+        listItem.querySelector('.viewButton').onclick = () => viewHTML(file.id);
+        listItem.querySelector('.editButton').onclick = () => openModal(file.id);
+        listItem.querySelector('.infoButton').onclick = () => showMetadata(file.id);
+        listItem.querySelector('.deleteButton').onclick = () => deleteHTML(file.id);
+
         htmlListElement.appendChild(listItem);
     });
 
@@ -110,7 +82,7 @@ export function formatTimeDifference(timestamp) {
         return savedTime.toLocaleDateString('en-US', {
             month: 'short',
             day: '2-digit',
-            year: 'numeric'
+            year: 'numeric',
         });
     }
 }
@@ -161,20 +133,15 @@ export async function openModal(fileId) {
 }
 
 export async function showMetadata(fileId) {
-    console.log(`showMetadata called with fileId: ${fileId}`);
-
     try {
         const file = await loadFileById(fileId);
         if (file) {
             console.log(`Showing metadata for file: ${file.name}`, file.metadata);
-            // Display metadata in the modal or wherever required
         } else {
             console.error(`File not found with ID: ${fileId}`);
-            alert(`File with ID ${fileId} not found.`);
         }
     } catch (error) {
         console.error(`Error loading metadata for file with ID: ${fileId}`, error);
-        alert(`An error occurred while trying to load metadata for file ID ${fileId}.`);
     }
 }
 

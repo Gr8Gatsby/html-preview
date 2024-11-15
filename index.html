@@ -31,10 +31,8 @@
         <div class="exit-bar">
             <button onclick="exitPreview()">Exit</button>
             <span id="documentName" style="margin-left: 10px; font-weight: bold;"></span>
-            <button onclick="showPrettyPrint(savedFiles)" style="margin-left: auto;">Pretty Print</button>
-            <button onclick="refreshPreview(savedFiles)">
-                <span class="material-icons">refresh</span>
-            </button>
+            <button onclick="showPrettyPrint()"><span class="material-icons">format_paint</span></button>
+            <button onclick="refreshPreview()"><span class="material-icons">refresh</span></button>
         </div>
         <div class="preview-frame-container">
             <iframe id="htmlPreview" class="preview-frame"></iframe>

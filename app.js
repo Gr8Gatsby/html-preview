@@ -1,20 +1,19 @@
 import { openModal, closeModal, saveHTML } from './js/modal.js';
-import { viewHTML, exitPreview, showPrettyPrint, closePrettyPrintModal, currentViewFileName, refreshPreview } from './js/preview.js';
+import { viewHTML, exitPreview, showPrettyPrint, closePrettyPrintModal, refreshPreview } from './js/preview.js';
 import { showMetadata, closeMetadataModal } from './js/metadata.js';
 import { loadHTMLFiles, toggleSortOrder, handleSearch } from './js/htmlFilesList.js';
-import { saveFiles, deleteHTML as deleteFile } from './js/storage.js';
+import { saveFile, loadSavedFiles, deleteFile } from './js/storage.js';
 
-let savedFiles = JSON.parse(localStorage.getItem('htmlFiles') || '[]');
-if (!Array.isArray(savedFiles)) {
-    savedFiles = [];
-}
-let documentCounter = savedFiles.length + 1; // Initialize counter based on existing documents
-let currentEditIndex = null; // Track the index of the currently edited item
+let documentCounter = 0; // Initialize counter for new documents
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
+// Initialize the app on DOM content load
+document.addEventListener('DOMContentLoaded', async () => {
+    const savedFiles = await loadSavedFiles(); // Fetch files from IndexedDB
+    documentCounter = savedFiles.length + 1; // Initialize counter based on existing files
+    loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML);
 });
 
+// Update title display logic
 function updateTitle() {
     const content = document.getElementById('htmlContent').value;
     const title = extractTitle(content);
@@ -26,39 +25,32 @@ function updateTitle() {
     }
 }
 
-// At the end of app.js or after defining each function
+// Save HTML file
+window.saveHTML = saveHTML;
+window.saveFile = saveFile;
+
+// Delete HTML file by ID
+window.deleteHTML = async (fileId) => {
+    await deleteFile(fileId); // Delete from IndexedDB
+    loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML); // Reload file list
+};
+
+// Extract title from HTML content
+function extractTitle(htmlContent) {
+    const titleMatch = htmlContent.match(/<title>(.*?)<\/title>/i);
+    return titleMatch ? titleMatch[1] : null;
+}
+
+// Attach other event handlers and functions to the global scope
 window.openModal = openModal;
 window.closeModal = closeModal;
-window.saveHTML = () => {
-    saveHTML(savedFiles, () => {
-        saveFiles(savedFiles);
-        loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
-    });
-};
 window.closePrettyPrintModal = closePrettyPrintModal;
 window.exitPreview = exitPreview;
-window.showMetadata = (index) => showMetadata(index, savedFiles);
+window.showMetadata = showMetadata;
 window.closeMetadataModal = closeMetadataModal;
-window.documentCounter = documentCounter;
-window.currentEditIndex = currentEditIndex;
-window.savedFiles = savedFiles;
-window.loadHTMLFiles = () => loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
 window.updateTitle = updateTitle;
-window.saveNameChange = (nameInput, index) => {
-    saveNameChange(nameInput, index);
-    saveFiles(savedFiles);
-};
-window.deleteHTML = (index) => {
-    savedFiles = deleteFile(savedFiles, index);
-    loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
-};
-window.viewHTML = viewHTML;
-window.currentViewFileName = currentViewFileName; // Updated to use currentViewFileName
-window.showPrettyPrint = () => showPrettyPrint(savedFiles);
-window.refreshPreview = () => refreshPreview(savedFiles);
-window.toggleSortOrder = () => {
-    toggleSortOrder();
-    saveFiles(savedFiles);
-    loadHTMLFiles(savedFiles, viewHTML, openModal, showMetadata, deleteHTML);
-};
+window.toggleSortOrder = toggleSortOrder;
 window.handleSearch = handleSearch;
+window.viewHTML = viewHTML;
+window.showPrettyPrint = showPrettyPrint;
+window.refreshPreview = refreshPreview;

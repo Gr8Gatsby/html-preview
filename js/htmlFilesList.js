@@ -46,19 +46,27 @@ export async function loadHTMLFiles() {
         listItem.classList.add('file-item');
         listItem.innerHTML = `
             <div class="file-card">
+                <!-- File Info Section -->
                 <div class="file-info">
                     <span class="file-name">${file.name}</span>
                     <span class="file-size">${fileSizeFormatted}</span>
-                    <span class="file-saved">67% saved</span>
-                </div>
-                <div class="file-metadata">
                     <span class="timestamp">${formatTimeDifference(file.createdAt)}</span>
                 </div>
+
+                <!-- Action Buttons -->
                 <div class="card-actions">
-                    <button class="icon-button viewButton" title="View"><i class="fas fa-eye"></i></button>
-                    <button class="icon-button editButton" title="Edit"><i class="fas fa-pen"></i></button>
-                    <button class="icon-button infoButton" title="Info"><i class="fas fa-info-circle"></i></button>
-                    <button class="icon-button deleteButton" title="Delete"><i class="fas fa-trash"></i></button>
+                    <button class="icon-button viewButton" title="View">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-button editButton" title="Edit">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="icon-button infoButton" title="Info">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="icon-button deleteButton" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         `;

@@ -1,0 +1,155 @@
+/* Metadata Modal Styles */
+#metadataModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#metadataModal .modal-content {
+    background: white;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styling */
+#metadataModal .modal-header {
+    padding: 12px 20px;
+    background: linear-gradient(to right, #ffffff, #f1f3f5); /* Soft gradient background */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+#metadataModal .modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 0.5px;
+}
+
+/* Close Button */
+#metadataModal .close-button {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+#metadataModal .close-button:hover {
+    color: #0056b3;
+}
+
+#metadataModal .close-button .material-icons {
+    font-size: 20px;
+}
+
+/* Modal Body Styling */
+#metadataModal .modal-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+    overflow-y: auto;
+}
+
+/* Info Section */
+#metadataModal .info-section {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    width: 100%;
+}
+
+#metadataModal .info-section:last-child {
+    border-bottom: none;
+}
+
+#metadataModal .info-label {
+    font-weight: bold;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+#metadataModal .info-value {
+    color: #333;
+    font-size: 0.9rem;
+    margin-left: 5px;
+}
+
+/* External URLs Section */
+#metadataModal .external-urls-section h3 {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+}
+
+#metadataModal .external-url-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+#metadataModal .external-url-item .material-icons {
+    margin-right: 5px;
+    font-size: 16px;
+}
+
+#metadataModal .external-url-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+#metadataModal .external-url-item a:hover {
+    text-decoration: underline;
+}
+
+/* Button Styling */
+.button-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    align-self: center;
+}
+
+.button-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    #metadataModal .modal-content {
+        width: 95%;
+    }
+
+    #metadataModal .close-button {
+        font-size: 20px;
+    }
+}

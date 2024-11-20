@@ -7,41 +7,6 @@ function generateGUID() {
     });
 }
 
-// Dictionary for basic HTML compression
-const dictionary = {
-    "<div>": "~D",
-    "</div>": "~d",
-    "<span>": "~S",
-    "</span>": "~s",
-    "<p>": "~P",
-    "</p>": "~p",
-    "<br>": "~B",
-    "<strong>": "~T",
-    "</strong>": "~t",
-    "class=\"": "~C",
-    "id=\"": "~I",
-    // Add more patterns as needed
-};
-
-// Compression function using dictionary
-function dictionaryCompress(input) {
-    let compressed = input;
-    for (const [key, value] of Object.entries(dictionary)) {
-        compressed = compressed.split(key).join(value);
-    }
-    return compressed;
-}
-
-// Decompression function using dictionary
-function dictionaryDecompress(input) {
-    let decompressed = input;
-    for (const [key, value] of Object.entries(dictionary)) {
-        decompressed = decompressed.split(value).join(key);
-    }
-    return decompressed;
-}
-
-
 // IndexedDB setup
 const dbName = "htmlFilesDB";
 const storeName = "files";
@@ -67,37 +32,17 @@ function openDatabase() {
     });
 }
 
-// Save a single file to IndexedDB with dictionary compression
+// Save a single file to IndexedDB
 export async function saveFile(fileName, htmlContent) {
     const db = await openDatabase();
     const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore(storeName);
 
-    // Calculate uncompressed size in bytes
-    const uncompressedSizeBytes = htmlContent.length;
-    const uncompressedSize = formatSize(uncompressedSizeBytes);
-
-    // Apply dictionary compression
-    const compressedContent = dictionaryCompress(htmlContent);
-    const compressedSizeBytes = compressedContent.length;
-    const compressedSize = formatSize(compressedSizeBytes);
-
-    // Log sizes for debugging
-    console.log("Saving file with sizes:");
-    console.log("Compressed Size:", compressedSize);
-    console.log("Uncompressed Size:", uncompressedSize);
-
     const file = {
         id: generateGUID(),
         name: fileName,
-        content: compressedContent,
-        createdAt: new Date().toISOString(),
-        metadata: {
-            compressedSize: compressedSize,
-            uncompressedSize: uncompressedSize,
-            compressedSizeBytes: compressedSizeBytes,
-            uncompressedSizeBytes: uncompressedSizeBytes
-        }
+        content: htmlContent,
+        createdAt: new Date().toISOString()
     };
 
     return new Promise((resolve, reject) => {
@@ -107,7 +52,7 @@ export async function saveFile(fileName, htmlContent) {
     });
 }
 
-// Load all saved files from IndexedDB (no decompression here)
+// Load all saved files from IndexedDB
 export async function loadSavedFiles() {
     const db = await openDatabase();
     const transaction = db.transaction(storeName, "readonly");
@@ -125,23 +70,14 @@ export async function loadSavedFiles() {
                 return;
             }
 
-            const mappedFiles = files.map(file => {
-                const uncompressedSizeBytes = file.metadata?.uncompressedSizeBytes || 0;
-                const compressedSizeBytes = file.metadata?.compressedSizeBytes || 0;
-
-                return {
+            resolve(
+                files.map(file => ({
                     id: file.id,
                     name: file.name,
-                    content: file.content, // Still compressed
-                    createdAt: file.createdAt,
-                    metadata: {
-                        compressedSize: formatSize(compressedSizeBytes),
-                        uncompressedSize: formatSize(uncompressedSizeBytes),
-                    }
-                };
-            });
-
-            resolve(mappedFiles);
+                    content: file.content,
+                    createdAt: file.createdAt
+                }))
+            );
         };
 
         request.onerror = () => {
@@ -151,7 +87,7 @@ export async function loadSavedFiles() {
     });
 }
 
-// Update an existing file in IndexedDB with dictionary compression
+// Update an existing file in IndexedDB
 export async function updateFile(fileId, fileName, htmlContent) {
     console.log(`updateFile called with fileId: ${fileId}, fileName: ${fileName}`);
 
@@ -159,37 +95,15 @@ export async function updateFile(fileId, fileName, htmlContent) {
     const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore(storeName);
 
-    // Calculate uncompressed size in bytes
-    const uncompressedSizeBytes = htmlContent.length;
-    const uncompressedSize = formatSize(uncompressedSizeBytes);
-
-    // Apply dictionary compression
-    const compressedContent = dictionaryCompress(htmlContent);
-    const compressedSizeBytes = compressedContent.length;
-    const compressedSize = formatSize(compressedSizeBytes);
-
-    // Log sizes and the ID for debugging
-    console.log("Attempting to update file with ID:", fileId);
-    console.log("Compressed Size:", compressedSize);
-    console.log("Uncompressed Size:", uncompressedSize);
-
-    // Prepare the file object with the correct ID to update the existing entry
     const file = {
-        id: fileId, // Use the provided fileId to ensure updating the correct file
+        id: fileId,
         name: fileName,
-        content: compressedContent,
-        createdAt: new Date().toISOString(),
-        metadata: {
-            compressedSize: compressedSize,
-            uncompressedSize: uncompressedSize,
-            compressedSizeBytes: compressedSizeBytes,
-            uncompressedSizeBytes: uncompressedSizeBytes
-        }
+        content: htmlContent,
+        createdAt: new Date().toISOString()
     };
 
     return new Promise((resolve, reject) => {
-        // Use put() to update or add a file with the given ID
-        const request = store.put(file);  // This should update the file if ID matches
+        const request = store.put(file);
         request.onsuccess = () => {
             console.log(`File with ID ${fileId} updated successfully.`);
             resolve(file.id);
@@ -200,7 +114,8 @@ export async function updateFile(fileId, fileName, htmlContent) {
         };
     });
 }
-// Load a specific file by its ID with dictionary decompression
+
+// Load a specific file by its ID
 export async function loadFileById(fileId) {
     const db = await openDatabase();
     const tx = db.transaction(storeName, "readonly");
@@ -209,31 +124,10 @@ export async function loadFileById(fileId) {
     return new Promise((resolve, reject) => {
         const request = store.get(fileId);
 
-        request.onsuccess = async () => {
+        request.onsuccess = () => {
             const file = request.result;
 
             if (file) {
-                // Decompress content using dictionary
-                const decodedContent = dictionaryDecompress(file.content);
-                let uncompressedSize = file.metadata?.uncompressedSize;
-
-                // Update uncompressed size if it was unknown
-                if (uncompressedSize === "Unknown") {
-                    uncompressedSize = decodedContent.length + " bytes";
-
-                    // Save the updated uncompressed size back to IndexedDB
-                    const updateTx = db.transaction(storeName, "readwrite");
-                    const updateStore = updateTx.objectStore(storeName);
-                    file.metadata.uncompressedSize = uncompressedSize;
-
-                    await new Promise((updateResolve, updateReject) => {
-                        const updateRequest = updateStore.put(file);
-                        updateRequest.onsuccess = () => updateResolve();
-                        updateRequest.onerror = () => updateReject(`Failed to update uncompressed size: ${updateRequest.error}`);
-                    });
-                }
-
-                file.content = decodedContent; // Return the decompressed content
                 resolve(file);
             } else {
                 reject(`File with ID ${fileId} not found.`);
@@ -246,49 +140,32 @@ export async function loadFileById(fileId) {
 
 // Delete a file by ID
 export async function deleteFile(fileId) {
+    // Show a confirmation dialog to the user
+    const userConfirmed = confirm("Are you sure you want to delete this file? This action cannot be undone.");
+
+    if (!userConfirmed) {
+        console.log(`Deletion canceled for file ID: ${fileId}`);
+        return; // Exit if the user cancels
+    }
+
     const db = await openDatabase();
     const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore(storeName);
 
     return new Promise((resolve, reject) => {
         const request = store.delete(fileId);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(`Failed to delete file with ID ${fileId}: ${request.error}`);
+        request.onsuccess = () => {
+            console.log(`File with ID ${fileId} has been deleted.`);
+            resolve();
+        };
+        request.onerror = () => {
+            console.error(`Failed to delete file with ID ${fileId}: ${request.error}`);
+            reject(`Failed to delete file with ID ${fileId}: ${request.error}`);
+        };
     });
 }
 
-// Increment document counter (uses count from IndexedDB)
-export async function incrementDocumentCounter() {
-    const db = await openDatabase();
-    const tx = db.transaction(storeName, "readonly");
-    const store = tx.objectStore(storeName);
-
-    return new Promise((resolve, reject) => {
-        const request = store.count();
-        request.onsuccess = () => resolve(request.result + 1);
-        request.onerror = () => reject(`Failed to count documents: ${request.error}`);
-    });
-}
-
-// Batch delete files by their IDs
-export async function deleteFiles(fileIds) {
-    const db = await openDatabase();
-    const tx = db.transaction(storeName, "readwrite");
-    const store = tx.objectStore(storeName);
-
-    return Promise.all(
-        fileIds.map(
-            fileId =>
-                new Promise((resolve, reject) => {
-                    const request = store.delete(fileId);
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(`Failed to delete file with ID ${fileId}: ${request.error}`);
-                })
-        )
-    );
-}
-
-// Fetch metadata only (no decompression)
+// Fetch metadata only
 export async function fetchMetadata() {
     const db = await openDatabase();
     const tx = db.transaction(storeName, "readonly");
@@ -300,23 +177,10 @@ export async function fetchMetadata() {
             const metadata = request.result.map(file => ({
                 id: file.id,
                 name: file.name,
-                createdAt: file.createdAt,
+                createdAt: file.createdAt
             }));
             resolve(metadata);
         };
         request.onerror = () => reject(`Failed to fetch metadata: ${request.error}`);
     });
-}
-
-function formatSize(bytes) {
-    const units = ['bytes', 'KB', 'MB', 'GB'];
-    let unitIndex = 0;
-    let size = bytes;
-
-    while (size >= 1024 && unitIndex < units.length - 1) {
-        size /= 1024;
-        unitIndex++;
-    }
-
-    return `${size.toFixed(2)} ${units[unitIndex]}`;
 }

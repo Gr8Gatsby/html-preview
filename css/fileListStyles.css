@@ -1,0 +1,61 @@
+/* File Card Styles */
+.file-card {
+    background-color: #ffffff; /* Light background */
+    border: 1px solid #ddd; /* Subtle border for separation */
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin: 8px 0; /* Adjust spacing between cards */
+    width: auto; /* Allow cards to auto-size based on content */
+    display: flex;
+    flex-direction: row; /* Arrange content horizontally */
+    align-items: center;
+    color: #333; /* Dark text color for readability */
+    box-shadow: none; /* Remove any outer shadow */
+}
+
+/* Content Styling */
+.file-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.9rem;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-size,
+.file-saved {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.file-metadata {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+/* Action Buttons */
+.card-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.icon-button:hover {
+    color: #007bff; /* Light blue on hover */
+}

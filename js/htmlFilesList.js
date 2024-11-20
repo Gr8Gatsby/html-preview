@@ -1,10 +1,12 @@
 import { loadSavedFiles, loadFileById, deleteFile } from './storage.js';
+import { viewHTML } from './preview.js'; // Imported from preview.js
+import { openModal } from './modal.js'; // Imported from modal.js
+import { showMetadata } from './metadata.js'; // Imported from metadata.js
 
 let sortOrderDescending = true;
 let searchQuery = '';
 
-// Function to load and display HTML files with sorting and filtering functionalities
-export async function loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML) {
+export async function loadHTMLFiles() {
     const htmlListElement = document.getElementById('htmlList');
 
     // Fetch files from IndexedDB
@@ -32,37 +34,90 @@ export async function loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTM
         return sortOrderDescending ? dateB - dateA : dateA - dateB;
     });
 
-    // If the list is empty or needs rebuilding, clear and re-render the list
+    // Clear and re-render the list
     htmlListElement.innerHTML = '';
     sortedFiles.forEach((file) => {
+        // Calculate the file size dynamically
+        const fileSizeBytes = new Blob([file.content]).size;
+        const fileSizeFormatted = formatFileSize(fileSizeBytes);
+
         const listItem = document.createElement('li');
-        listItem.dataset.fileId = file.id; // Attach file ID to the element
-        listItem.classList.add('file-item'); // Add a class for styling
+        listItem.dataset.fileId = file.id;
+        listItem.classList.add('file-item');
         listItem.innerHTML = `
-            <div class="file-info">
-                <span class="file-name">${file.name} (ID: ${file.id})</span>
-                <span class="timestamp">${formatTimeDifference(file.createdAt)}</span>
-            </div>
-            <div class="button-group">
-                <button class="icon-button viewButton" title="View"><i class="material-icons">visibility</i></button>
-                <button class="icon-button editButton" title="Edit"><i class="material-icons">edit</i></button>
-                <button class="icon-button infoButton" title="Info"><i class="material-icons">info</i></button>
-                <button class="icon-button deleteButton" title="Delete"><i class="material-icons">delete</i></button>
+            <div class="file-card">
+                <div class="file-info">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${fileSizeFormatted}</span>
+                    <span class="file-saved">67% saved</span>
+                </div>
+                <div class="file-metadata">
+                    <span class="timestamp">${formatTimeDifference(file.createdAt)}</span>
+                </div>
+                <div class="card-actions">
+                    <button class="icon-button viewButton" title="View"><i class="fas fa-eye"></i></button>
+                    <button class="icon-button editButton" title="Edit"><i class="fas fa-pen"></i></button>
+                    <button class="icon-button infoButton" title="Info"><i class="fas fa-info-circle"></i></button>
+                    <button class="icon-button deleteButton" title="Delete"><i class="fas fa-trash"></i></button>
+                </div>
             </div>
         `;
 
-        // Attach event listeners to buttons
-        listItem.querySelector('.viewButton').onclick = () => viewHTML(file.id);
-        listItem.querySelector('.editButton').onclick = () => openModal(file.id);
-        listItem.querySelector('.infoButton').onclick = () => showMetadata(file.id);
-        listItem.querySelector('.deleteButton').onclick = () => deleteHTML(file.id);
+        // Attach event listeners with the correct function references
+        listItem.querySelector('.viewButton').addEventListener('click', () => viewHTML(file.id));
+        listItem.querySelector('.editButton').addEventListener('click', () => openModal(file.id));
+        listItem.querySelector('.infoButton').addEventListener('click', () => showMetadata(file.id));
+        listItem.querySelector('.deleteButton').addEventListener('click', () => {
+            deleteFile(file.id).then(() => loadHTMLFiles());
+        });
 
         htmlListElement.appendChild(listItem);
     });
 
-    // Update the sort icon based on the current sort order
     updateSortIcon();
 }
+
+// Helper function to format file size
+function formatFileSize(bytes) {
+    const units = ['bytes', 'KB', 'MB', 'GB'];
+    let unitIndex = 0;
+    let size = bytes;
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+    }
+
+    return `${size.toFixed(2)} ${units[unitIndex]}`;
+}
+
+// Event delegation setup
+document.getElementById('htmlList').addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button) return;
+
+    const fileId = button.closest('li').dataset.fileId;
+    const action = button.dataset.action;
+
+    if (!fileId || !action) return;
+
+    switch (action) {
+        case 'view':
+            viewHTML(fileId);
+            break;
+        case 'edit':
+            openModal(fileId);
+            break;
+        case 'info':
+            showMetadata(fileId);
+            break;
+        case 'delete':
+            deleteFile(fileId).then(() => loadHTMLFiles());
+            break;
+        default:
+            console.warn('Unknown action:', action);
+    }
+});
 
 // Function to format time differences for display
 export function formatTimeDifference(timestamp) {
@@ -90,63 +145,25 @@ export function formatTimeDifference(timestamp) {
 // Function to toggle sort order and reload the list
 export function toggleSortOrder() {
     sortOrderDescending = !sortOrderDescending;
-    loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML); // Re-call with updated order
+    loadHTMLFiles();
 }
 
 // Function to update the sort icon based on the order
 function updateSortIcon() {
     const sortButton = document.getElementById('sortButton');
-    const iconElement = sortButton.querySelector('.material-icons');
-
-    // Update the icon based on the sort order
-    if (sortOrderDescending) {
-        iconElement.textContent = 'south'; // Represents descending order
-    } else {
-        iconElement.textContent = 'north'; // Represents ascending order
+    if (sortButton) {
+        const iconElement = sortButton.querySelector('.material-icons');
+        if (iconElement) {
+            iconElement.textContent = sortOrderDescending ? 'south' : 'north';
+        }
     }
 }
 
 // Function to handle search input
 export function handleSearch() {
     const searchInput = document.getElementById('searchInput');
-    searchQuery = searchInput.value.trim();
-    loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML);
-}
-
-// Modify functions to work with `id`
-export async function viewHTML(fileId) {
-    const file = await loadFileById(fileId);
-    if (file) {
-        console.log(`Viewing content of file: ${file.name}`, file.content);
-    } else {
-        console.error(`File not found: ${fileId}`);
+    if (searchInput) {
+        searchQuery = searchInput.value.trim();
+        loadHTMLFiles();
     }
-}
-
-export async function openModal(fileId) {
-    const file = await loadFileById(fileId);
-    if (file) {
-        console.log(`Editing file: ${file.name}`, file);
-    } else {
-        console.error(`File not found: ${fileId}`);
-    }
-}
-
-export async function showMetadata(fileId) {
-    try {
-        const file = await loadFileById(fileId);
-        if (file) {
-            console.log(`Showing metadata for file: ${file.name}`, file.metadata);
-        } else {
-            console.error(`File not found with ID: ${fileId}`);
-        }
-    } catch (error) {
-        console.error(`Error loading metadata for file with ID: ${fileId}`, error);
-    }
-}
-
-export async function deleteHTML(fileId) {
-    await deleteFile(fileId);
-    await loadHTMLFiles(viewHTML, openModal, showMetadata, deleteHTML); // Reload the list after deletion
-    console.log(`Deleted file with ID: ${fileId}`);
 }
